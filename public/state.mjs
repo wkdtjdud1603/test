@@ -2,6 +2,11 @@ export function emptyState() { return {entries:[],one:'내가 진짜 원하는 �
 export function validateState(s) {
   const text = value => typeof value === 'string';
   if (!s || !text(s.one) || !Array.isArray(s.entries) || !s.entries.every(e=>e && text(e.title) && text(e.text) && text(e.date)) || !Array.isArray(s.dominos) || s.dominos.length === 0 || !s.dominos.every(d=>d && text(d.title) && text(d.note) && Array.isArray(d.tasks) && d.tasks.every(t=>t && text(t.text) && typeof t.done==='boolean')) || !Array.isArray(s.bucket) || !s.bucket.every(b=>b && text(b.title) && text(b.category) && typeof b.done==='boolean') || !Number.isInteger(s.round) || s.round<0 || s.round>4 || !s.votes || typeof s.votes!=='object' || Array.isArray(s.votes) || !Object.values(s.votes).every(v=>Number.isInteger(v) && v>=0)) throw new Error('여행 데이터 형식이 올바르지 않아요');
+  if(s.profile!==undefined){
+    const p=s.profile;
+    if(!p || typeof p!=='object' || !text(p.nickname) || !p.nickname.trim() || p.nickname.length>24 || !['🧑‍🚀','🧑‍🎨','🧙','🧑‍🌾'].includes(p.avatar) || !Array.isArray(p.values) || p.values.length!==2 || new Set(p.values).size!==2 || !p.values.every(v=>['자유','성장','사랑과 관계','건강과 평온','창작','기여'].includes(v)) || !text(p.dream) || !p.dream.trim() || p.dream.length>300 || !text(p.feeling) || !p.feeling.trim() || p.feeling.length>300 || !text(p.first) || !p.first.trim() || p.first.length>180 || !['5','15','30'].includes(p.minutes) || p.completed!==true)throw new Error('여행 여권 형식이 올바르지 않아요');
+  }
+  if(s.entries.some(e=>e.mood!==undefined&&!['설레요','평온해요','복잡해요','지쳤어요'].includes(e.mood)))throw new Error('마음 날씨 형식이 올바르지 않아요');
   return s;
 }
 export function encodeState(s) { validateState(s); const payload=JSON.stringify(s); if(new TextEncoder().encode(payload).length>700000) throw new Error('현재 버전의 기록 용량을 초과했어요'); return payload; }

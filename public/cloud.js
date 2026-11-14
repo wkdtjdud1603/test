@@ -8,7 +8,7 @@ let user = null, revision = 0, pending = 0, failed = false, chain = Promise.reso
 const setStatus = text => { status.textContent = text; };
 const lock = value => { content.inert = value; document.querySelector('#modalform').inert = value; };
 const reset = () => { window.lifeTravel.replace(emptyState()); lock(true); };
-const guestNote = '체험 모드 · 기록은 현재 탭에 임시 저장됩니다. 탭을 닫기 전에 ↥ 버튼으로 내보내세요. Firebase 연결 후 로그인하면 계정에 저장할 수 있어요.';
+const guestNote = '체험 모드 · 기록은 현재 탭에 임시 저장됩니다. 탭을 닫기 전에 ↑ 버튼으로 내보내세요. Firebase 연결 후 로그인하면 계정에 저장할 수 있어요.';
 function guestMode() {
   try { const cached = sessionStorage.getItem('life-travel-guest'); if (cached) window.lifeTravel.replace(validateState(JSON.parse(cached))); } catch { sessionStorage.removeItem('life-travel-guest'); }
   lock(false); setStatus('체험 모드 · 현재 탭에 임시 저장');
@@ -17,7 +17,7 @@ function guestMode() {
 window.lifeCloud = { save(state) {
   if (!user) {
     try { sessionStorage.setItem('life-travel-guest', encodeState(state)); setStatus('● 현재 탭에 임시 저장됨'); }
-    catch { setStatus('임시 저장 실패 · ↥ 버튼으로 내보내주세요'); }
+    catch { setStatus('임시 저장 실패 · ↑ 버튼으로 내보내주세요'); }
     return;
   }
   if (failed) { setStatus('클라우드 저장 불가 · 내보내기로 백업해주세요'); return; }
