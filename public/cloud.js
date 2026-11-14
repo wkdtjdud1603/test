@@ -54,7 +54,7 @@ async function start() {
   try {
     const [appSDK, authSDK, firestoreSDK] = await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
     api = firestoreSDK;
-    const app = appSDK.initializeApp(config); const auth = authSDK.getAuth(app); db = api.getFirestore(app);
+    const app = appSDK.initializeApp(config); const auth = authSDK.getAuth(app); db = api.getFirestore(app, config.databaseId || '(default)');
     login.disabled = false;
     login.onclick = async () => { if (sessionStorage.getItem('life-travel-guest') && !confirm('체험 기록은 이 탭에 남아 있으며 계정에 자동 업로드되지 않습니다. 필요한 기록은 먼저 내보내 주세요. 로그인할까요?')) return; login.disabled = true; try { await authSDK.signInWithPopup(auth, new authSDK.GoogleAuthProvider()); } catch { setStatus('로그인을 완료하지 못했어요 · 다시 시도해주세요'); } finally { login.disabled = false; } };
     logout.onclick = async () => { if (pending || failed) return; await authSDK.signOut(auth); };

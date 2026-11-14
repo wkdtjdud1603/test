@@ -1,6 +1,6 @@
 import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 await rm('dist',{recursive:true,force:true}); await mkdir('dist',{recursive:true}); await cp('public','dist',{recursive:true});
-const keys={apiKey:'FIREBASE_API_KEY',authDomain:'FIREBASE_AUTH_DOMAIN',projectId:'FIREBASE_PROJECT_ID',appId:'FIREBASE_APP_ID',messagingSenderId:'FIREBASE_MESSAGING_SENDER_ID',storageBucket:'FIREBASE_STORAGE_BUCKET'};
+const keys={databaseId:'FIRESTORE_DATABASE_ID',apiKey:'FIREBASE_API_KEY',authDomain:'FIREBASE_AUTH_DOMAIN',projectId:'FIREBASE_PROJECT_ID',appId:'FIREBASE_APP_ID',messagingSenderId:'FIREBASE_MESSAGING_SENDER_ID',storageBucket:'FIREBASE_STORAGE_BUCKET'};
 const config=Object.fromEntries(Object.entries(keys).map(([key,env])=>[key,process.env[env]||'']));
 const required=['apiKey','authDomain','projectId','appId'];
 if(required.some(key=>!config[key])) {

@@ -7,7 +7,7 @@
 
 1. https://console.firebase.google.com/ 에서 프로젝트를 생성하고 웹 앱을 등록합니다.
 2. Authentication → Sign-in method → Google을 활성화합니다. 지원 이메일을 지정합니다.
-3. Firestore Database를 Standard / Native 모드로 생성합니다. 위치는 생성 시 신중하게 선택합니다.
+3. Firestore Database를 Enterprise / Native 모드로 생성합니다. 위치는 생성 시 신중하게 선택합니다.
 4. Firestore Rules에 이 저장소의 `firestore.rules` 내용을 게시합니다. 또는 Firebase CLI 로그인 후 `firebase deploy --only firestore:rules --project 프로젝트ID`를 실행합니다.
 5. 프로젝트 설정 → 내 앱의 웹 설정에서 apiKey, authDomain, projectId, appId를 확인합니다.
 6. Vercel 배포 도메인을 Authentication → Settings → Authorized domains에 추가합니다. 미리보기 배포는 승인된 고정 도메인을 사용합니다. 로컬 테스트는 localhost도 등록합니다.
@@ -30,7 +30,7 @@ Firebase 웹 앱 설정은 브라우저에서 사용하는 공개 식별값입�
 
 ## 저장 방식과 한계
 
-Google 로그인 계정 UID별 `/users/{uid}/journey/current` 문서에 전체 여행 상태를 JSON 문자열로 저장합니다.
+Google 로그인 계정 UID별 서울 asia-northeast3의 `journey` 데이터베이스 내 `/users/{uid}/journey/current` 문서에 전체 여행 상태를 JSON 문자열로 저장합니다.
 개인 초기 버전: UTF-8 기준 약 700KB까지. 대량 일기는 개별 문서 컬렉션으로 분리하는 후속 마이그레이션이 필요합니다.
 저장은 트랜잭션으로 순차 처리하고 revision을 비교합니다. 다른 탭/기기의 변경은 자동 덮어쓰지 않고 편집을 잠급니다.
 실패 시 화면의 내용을 JSON으로 내보내고 새로고침 후 필요한 데이터를 가져옵니다.
@@ -50,3 +50,5 @@ Firebase Emulator Suite 또는 Rules Playground에서 비로그인 접근과 다
 - https://firebase.google.com/docs/auth/web/google-signin
 - https://firebase.google.com/docs/firestore/security/rules-conditions
 - https://vercel.com/docs/project-configuration/vercel-json
+
+현재 연결 프로젝트: Test (`test-b02b6`). Firestore: `journey`, Enterprise Native, 서울 `asia-northeast3`. 운영 도메인: https://life-travel-lemon.vercel.app/ . 운영 환경 변수만 설정하며 Preview는 체험 모드를 사용합니다.

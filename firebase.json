@@ -1,1 +1,9 @@
-{"firestore":{"rules":"firestore.rules"}}
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json",
+    "database": "journey",
+    "edition": "enterprise",
+    "location": "asia-northeast3"
+  }
+}

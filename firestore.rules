@@ -1,14 +1,19 @@
+// Private journey snapshot: schemaVersion int=1; payload JSON string <=700000;
+// revision int incremented by one; updatedAt server timestamp. Owner UID is in path.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid}/journey/current {
       function owner() { return request.auth != null && request.auth.uid == uid; }
       function valid() {
-        return request.resource.data.keys().hasOnly(['schemaVersion','payload','revision','updatedAt'])
+        return request.resource.data.keys().hasAll(['schemaVersion','payload','revision','updatedAt'])
+          && request.resource.data.keys().hasOnly(['schemaVersion','payload','revision','updatedAt'])
+          && request.resource.data.schemaVersion is int
           && request.resource.data.schemaVersion == 1
           && request.resource.data.payload is string
           && request.resource.data.payload.size() <= 700000
           && request.resource.data.revision is int
+          && request.resource.data.updatedAt is timestamp
           && request.resource.data.updatedAt == request.time;
       }
       allow read: if owner();
