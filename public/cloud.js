@@ -8,8 +8,19 @@ let user = null, revision = 0, pending = 0, failed = false, chain = Promise.reso
 const setStatus = text => { status.textContent = text; };
 const lock = value => { content.inert = value; document.querySelector('#modalform').inert = value; };
 const reset = () => { window.lifeTravel.replace(emptyState()); lock(true); };
+const guestNote = '체험 모드 · 기록은 현재 탭에 임시 저장됩니다. 탭을 닫기 전에 ↥ 버튼으로 내보내세요. Firebase 연결 후 로그인하면 계정에 저장할 수 있어요.';
+function guestMode() {
+  try { const cached = sessionStorage.getItem('life-travel-guest'); if (cached) window.lifeTravel.replace(validateState(JSON.parse(cached))); } catch { sessionStorage.removeItem('life-travel-guest'); }
+  lock(false); setStatus('체험 모드 · 현재 탭에 임시 저장');
+  document.querySelector('#connection-note').textContent = guestNote;
+}
 window.lifeCloud = { save(state) {
-  if (!user || failed) { setStatus('저장 불가 · 로그인과 연결 상태를 확인하세요'); return; }
+  if (!user) {
+    try { sessionStorage.setItem('life-travel-guest', encodeState(state)); setStatus('● 현재 탭에 임시 저장됨'); }
+    catch { setStatus('임시 저장 실패 · ↥ 버튼으로 내보내주세요'); }
+    return;
+  }
+  if (failed) { setStatus('클라우드 저장 불가 · 내보내기로 백업해주세요'); return; }
   let payload;
   try { payload = encodeState(state); } catch (error) { failed = true; lock(true); setStatus(error.message + ' · 먼저 내보내기로 백업하세요'); return; }
   const uid = user.uid;
@@ -35,22 +46,22 @@ window.lifeCloud = { save(state) {
 window.addEventListener('beforeunload', event => { if (pending || failed) { event.preventDefault(); event.returnValue = ''; } });
 let api, db;
 async function start() {
-  lock(true);
+  guestMode();
   let config;
   try { const response = await fetch('/firebase-config.json', {cache:'no-store'}); if (!response.ok) throw new Error(); config = await response.json(); if (!config.projectId || !config.apiKey) throw new Error(); }
-  catch { setStatus('Firebase 설정 전 · 프로젝트 연결이 필요해요'); document.querySelector('#connection-note').textContent = 'Firebase 프로젝트 연결을 기다리고 있어요. 연결 후 Google 계정으로 로그인해 나만의 여행을 시작할 수 있어요.'; login.disabled = true; return; }
+  catch { guestMode(); login.disabled = true; return; }
   const base = 'https://www.gstatic.com/firebasejs/12.7.0/';
   try {
     const [appSDK, authSDK, firestoreSDK] = await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
     api = firestoreSDK;
     const app = appSDK.initializeApp(config); const auth = authSDK.getAuth(app); db = api.getFirestore(app);
     login.disabled = false;
-    login.onclick = async () => { login.disabled = true; try { await authSDK.signInWithPopup(auth, new authSDK.GoogleAuthProvider()); } catch { setStatus('로그인을 완료하지 못했어요 · 다시 시도해주세요'); } finally { login.disabled = false; } };
+    login.onclick = async () => { if (sessionStorage.getItem('life-travel-guest') && !confirm('체험 기록은 이 탭에 남아 있으며 계정에 자동 업로드되지 않습니다. 필요한 기록은 먼저 내보내 주세요. 로그인할까요?')) return; login.disabled = true; try { await authSDK.signInWithPopup(auth, new authSDK.GoogleAuthProvider()); } catch { setStatus('로그인을 완료하지 못했어요 · 다시 시도해주세요'); } finally { login.disabled = false; } };
     logout.onclick = async () => { if (pending || failed) return; await authSDK.signOut(auth); };
     authSDK.onAuthStateChanged(auth, async next => {
-      user = next; revision = 0; failed = false; reset();
+      user = next; revision = 0; failed = false; if (next) reset();
       login.hidden = !!next; logout.hidden = !next;
-      if (!next) { setStatus('로그인 후 Firebase에 저장'); document.querySelector('#connection-note').textContent = 'Google 계정으로 로그인하면 기록과 목표가 내 계정에 저장돼요.'; return; }
+      if (!next) { window.lifeTravel.replace(emptyState()); guestMode(); return; }
       setStatus('나의 여행을 불러오는 중…');
       try {
         const snapshot = await api.getDocFromServer(api.doc(db,'users',next.uid,'journey','current'));
@@ -60,6 +71,6 @@ async function start() {
         document.querySelector('#connection-note').textContent = `${next.displayName || '여행자'}님의 여행 · 변경한 내용은 Firebase에 자동 저장됩니다.`;
       } catch { failed = true; lock(true); setStatus('기록을 불러오지 못했어요 · 연결 및 Firestore 규칙을 확인하고 새로고침하세요'); }
     });
-  } catch { setStatus('Firebase 연결 실패 · 네트워크 상태를 확인하고 새로고침하세요'); }
+  } catch { guestMode(); login.disabled = true; setStatus('Firebase 연결 실패 · 체험 모드로 사용 중'); }
 }
 start();

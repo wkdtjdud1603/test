@@ -18,7 +18,7 @@ GitHub 저장소를 Import하고 이 파일이 있는 폴더를 Root Directory�
 Framework Preset: Other. Build Command: `npm run build`. Output Directory: `dist`.
 `vercel.json`에 같은 설정이 포함되어 있습니다. 의존 패키지는 없습니다.
 Vercel 프로젝트 환경 변수에 `.env.example`의 값을 입력합니다. 앞의 네 변수는 필수입니다.
-환경 변수 등록 뒤 재배포합니다. Firebase 설정값이 없어도 배포되며, 로그인과 기록 저장은 연결 대기 상태로 잠깁니다.
+환경 변수 등록 뒤 재배포합니다. Firebase 설정값이 없어도 배포되며, Google 로그인은 비활성화되고, 기록과 목표 작성은 체험 모드로 이용할 수 있습니다.
 Firebase 웹 앱 설정은 브라우저에서 사용하는 공개 식별값입니다. 서비스 계정 비공개 키는 넣지 않습니다.
 
 ## 개발 / 검증
@@ -26,7 +26,7 @@ Firebase 웹 앱 설정은 브라우저에서 사용하는 공개 식별값입�
 배포 런타임은 Node.js 24.x로 고정합니다. 로컬은 Node.js 22 이상. `npm test`, `npm run build`.
 로컬 환경 변수는 쉘에서 주입합니다. Node 22 이상은 `node --env-file=.env.local scripts/build.mjs`도 사용할 수 있습니다.
 빌드 후 dist를 HTTP 서버로 제공합니다. ES 모듈을 사용하므로 HTML 파일 직접 열기는 지원하지 않습니다.
-설정값 없는 로컬/Preview 빌드는 로그인과 저장이 잠긴 연결 대기 화면을 표시합니다.
+설정값이 없으면 체험 모드로 작동하며 sessionStorage에 현재 탭의 데이터를 임시 보관합니다. 탭을 닫기 전에 JSON으로 내보내세요.
 
 ## 저장 방식과 한계
 
@@ -35,7 +35,7 @@ Google 로그인 계정 UID별 `/users/{uid}/journey/current` 문서에 전체 �
 저장은 트랜잭션으로 순차 처리하고 revision을 비교합니다. 다른 탭/기기의 변경은 자동 덮어쓰지 않고 편집을 잠급니다.
 실패 시 화면의 내용을 JSON으로 내보내고 새로고침 후 필요한 데이터를 가져옵니다.
 오프라인 편집/동기화와 다른 기기의 실시간 구독은 제공하지 않습니다. 체크에 따른 화면 진행률은 즉시 반영됩니다.
-기록은 localStorage에 저장하지 않으며, 새 계정에 예시 일기를 업로드하지 않습니다.
+로그인한 계정 기록은 localStorage/sessionStorage에 저장하지 않습니다. 체험 기록만 별도 sessionStorage에 보관하며 계정에 자동 업로드하지 않습니다.
 기존 로컬 버전의 내보내기 JSON은 로그인 후 '나의 기록'에서 가져올 수 있습니다. 가져오기는 현재 여행을 교체합니다.
 
 ## 배포 후 필수 확인
