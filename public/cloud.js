@@ -49,7 +49,7 @@ async function start() {
   guestMode();
   let config;
   try { const response = await fetch('/firebase-config.json', {cache:'no-store'}); if (!response.ok) throw new Error(); config = await response.json(); if (!config.projectId || !config.apiKey) throw new Error(); }
-  catch { guestMode(); login.disabled = true; return; }
+  catch { login.disabled = true; return; }
   const base = 'https://www.gstatic.com/firebasejs/12.7.0/';
   try {
     const [appSDK, authSDK, firestoreSDK] = await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
@@ -59,9 +59,9 @@ async function start() {
     login.onclick = async () => { if (sessionStorage.getItem('life-travel-guest') && !confirm('체험 기록은 이 탭에 남아 있으며 계정에 자동 업로드되지 않습니다. 필요한 기록은 먼저 내보내 주세요. 로그인할까요?')) return; login.disabled = true; try { await authSDK.signInWithPopup(auth, new authSDK.GoogleAuthProvider()); } catch { setStatus('로그인을 완료하지 못했어요 · 다시 시도해주세요'); } finally { login.disabled = false; } };
     logout.onclick = async () => { if (pending || failed) return; await authSDK.signOut(auth); };
     authSDK.onAuthStateChanged(auth, async next => {
-      user = next; revision = 0; failed = false; if (next) reset();
+      const previousUser = user; user = next; revision = 0; failed = false; if (next) reset();
       login.hidden = !!next; logout.hidden = !next;
-      if (!next) { window.lifeTravel.replace(emptyState()); guestMode(); return; }
+      if (!next) { if (previousUser) { window.lifeTravel.replace(emptyState()); guestMode(); } return; }
       setStatus('나의 여행을 불러오는 중…');
       try {
         const snapshot = await api.getDocFromServer(api.doc(db,'users',next.uid,'journey','current'));
@@ -71,6 +71,6 @@ async function start() {
         document.querySelector('#connection-note').textContent = `${next.displayName || '여행자'}님의 여행 · 변경한 내용은 Firebase에 자동 저장됩니다.`;
       } catch { failed = true; lock(true); setStatus('기록을 불러오지 못했어요 · 연결 및 Firestore 규칙을 확인하고 새로고침하세요'); }
     });
-  } catch { guestMode(); login.disabled = true; setStatus('Firebase 연결 실패 · 체험 모드로 사용 중'); }
+  } catch { login.disabled = true; setStatus('Firebase 연결 실패 · 체험 모드로 사용 중'); }
 }
 start();
