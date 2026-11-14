@@ -4,6 +4,5 @@ const keys={apiKey:'FIREBASE_API_KEY',authDomain:'FIREBASE_AUTH_DOMAIN',projectI
 const config=Object.fromEntries(Object.entries(keys).map(([key,env])=>[key,process.env[env]||'']));
 const required=['apiKey','authDomain','projectId','appId'];
 if(required.some(key=>!config[key])) {
-  if(process.env.VERCEL_ENV==='production') throw new Error('Firebase 환경 변수를 먼저 등록해주세요.');
   console.warn('Firebase 설정 없음: 로그인과 기록 저장이 비활성화된 화면을 생성합니다.');
 } else await writeFile('dist/firebase-config.json',JSON.stringify(config));

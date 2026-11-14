@@ -18,12 +18,12 @@ GitHub 저장소를 Import하고 이 파일이 있는 폴더를 Root Directory�
 Framework Preset: Other. Build Command: `npm run build`. Output Directory: `dist`.
 `vercel.json`에 같은 설정이 포함되어 있습니다. 의존 패키지는 없습니다.
 Vercel 프로젝트 환경 변수에 `.env.example`의 값을 입력합니다. 앞의 네 변수는 필수입니다.
-환경 변수 등록 뒤 재배포합니다. Production은 설정값 없이 빌드하면 실패합니다.
+환경 변수 등록 뒤 재배포합니다. Firebase 설정값이 없어도 배포되며, 로그인과 기록 저장은 연결 대기 상태로 잠깁니다.
 Firebase 웹 앱 설정은 브라우저에서 사용하는 공개 식별값입니다. 서비스 계정 비공개 키는 넣지 않습니다.
 
 ## 개발 / 검증
 
-Node.js 22 이상. `npm test`, `npm run build`.
+배포 런타임은 Node.js 24.x로 고정합니다. 로컬은 Node.js 22 이상. `npm test`, `npm run build`.
 로컬 환경 변수는 쉘에서 주입합니다. Node 22 이상은 `node --env-file=.env.local scripts/build.mjs`도 사용할 수 있습니다.
 빌드 후 dist를 HTTP 서버로 제공합니다. ES 모듈을 사용하므로 HTML 파일 직접 열기는 지원하지 않습니다.
 설정값 없는 로컬/Preview 빌드는 로그인과 저장이 잠긴 연결 대기 화면을 표시합니다.
