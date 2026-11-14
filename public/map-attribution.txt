@@ -1,0 +1,2 @@
+World land geometry: Natural Earth, 1:110m land (public domain). https://www.naturalearthdata.com/
+Artwork and layout: Life Travel. This map illustrates life destinations, not visited travel locations.
